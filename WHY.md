@@ -5,7 +5,7 @@ Sinh viên năm 3 ngành AI. Trước đây tôi có thể chơi game nguyên ng
 
 ## Vì sao tôi làm việc này
 - Tôi mong muốn bố mẹ nở mày nở mặt về tôi
-- Tôi muốn chứng minh cho anh trai tôi thấy tiền bố mẹ nuôi tôi ăn học là phung phí.
+- Tôi muốn chứng minh cho anh trai tôi thấy tiền bố mẹ nuôi tôi ăn học không phải là phung phí.
 - Tôi muốn có 1 tương lai mà tôi hướng tới.
 
 ## Mục tiêu
