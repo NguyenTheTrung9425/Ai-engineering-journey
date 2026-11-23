@@ -1,0 +1,10 @@
+[
+  {
+    "role": "user",
+    "content": "Tôi là Trung"
+  },
+  {
+    "role": "model",
+    "content": "Chào bạn Trung! Rất vui được trò chuyện với bạn. Hôm nay tôi có thể giúp gì cho bạn nào?"
+  }
+]
