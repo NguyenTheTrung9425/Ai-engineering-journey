@@ -36,6 +36,7 @@ st.markdown(
 )
 
 
+
 st.title("🤖 My AI Chatbot")
 st.caption("Project week 01 - FastAPI + Gemini + Groq Fallback + Streamlit")
 
@@ -44,8 +45,15 @@ with st.sidebar:
     st.header("Settings ⚙️")
     session_id = st.text_input("Tên của bạn (Session ID):", value = "Trung")
     if st.button("Reset Session"):
-        st.session_state.session_history = []
-        st.rerun()
+        # Gửi request xóa session tới backend FastAPI
+        reset_url = f"http://127.0.0.1:8000/session/{session_id}"
+        try:
+            response = requests.delete(reset_url, timeout=10)
+            if response.status_code == 200:
+                st.success(f"Session {session_id} đã được reset.")
+                st.session_state.session_history = []  # Xóa lịch sử chat trên Streamlit
+        except requests.exceptions.RequestException as e:
+            st.error(f"Không thể reset session. Lỗi: {e}")
 
 # 2. Quản lý trạng thái tin nhắn trên giao diện của Streamlit
 
@@ -62,7 +70,7 @@ if prompt := st.chat_input("Hỏi tôi bất cứ điều gì..."):
     # Hiển thị ngay câu hỏi của bạn lên màn hình
     st.session_state.session_history.append({"role": "user", "content": prompt})   
     with st.chat_message("user"):
-        st.markdown(prompt) 
+            st.markdown(prompt) 
 
     # 5. Gửi request tới Backend FastAPI (cổng 8000)
     backend_url = "http://127.0.0.1:8000/chat"
@@ -71,7 +79,7 @@ if prompt := st.chat_input("Hỏi tôi bất cứ điều gì..."):
     with st.chat_message("assistant"):
         with st.spinner("AI đang suy nghĩ..."):
             try:
-                response = requests.post(backend_url, json=payload)
+                response = requests.post(backend_url, json=payload, timeout=30)
                 if response.status_code == 200:
                     data = response.json()
                     bot_reply = data["reply"]
@@ -82,7 +90,7 @@ if prompt := st.chat_input("Hỏi tôi bất cứ điều gì..."):
                     st.caption(f"Model used: {model_used}")
 
                     # Lưu vào danh sách hiển thị
-                    st.session_state.session_history.append({"role": "model", "content": bot_reply})
+                    st.session_state.session_history.append({"role": "assistant", "content": bot_reply})
                 else:
                     st.error(f"Error: Mã {response.status_code}")
             except requests.exceptions.RequestException as e:

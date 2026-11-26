@@ -42,7 +42,7 @@ def ask_gemini(history):
             wait_time = 2 ** attempt  # Exponential backoff
             print(f"[Lỗi {e.code}] Thử lại lần {attempt + 1} sau {wait_time} giây...")
             time.sleep(wait_time)  # Wait for the exponential backoff time before retrying
-    return "Xin lỗi, sever đang quá tải. Vui lòng thử lại sau."
+    raise HTTPException(status_code=503, detail="Gemini API không khả dụng sau 3 lần thử. Vui lòng thử lại sau.")
 
 def ask_groq(history):
     messages = []
@@ -72,6 +72,16 @@ def get_ai_reply(history):
 @app.get("/")
 def home():
     return {"message": "Server đang chạy ngon lành!"}
+
+
+
+@app.delete("/session/{session_id}")
+def reset_session(session_id: str):
+    session.pop(session_id, None)
+    return {"message": f"Session {session_id} đã được reset."}
+
+
+
 @app.post("/chat", response_model=ChatResponse)
 
 def chat_endpoint(req: ChatRequest):
