@@ -1,6 +1,11 @@
 import os, time
 from dotenv import load_dotenv
 
+from week01.database import init_db, save_message, get_history, delete_history
+
+  
+
+  
 from fastapi import FastAPI, HTTPException   
 from pydantic import BaseModel
 from google import genai
@@ -16,7 +21,7 @@ groq_model = "openai/gpt-oss-20b"
 
 app = FastAPI(title = "AI Chatbot API")
 
-session = {}
+init_db()  # Initialize the database when the FastAPI app starts
 
 class ChatRequest(BaseModel):
     session_id: str
@@ -77,7 +82,7 @@ def home():
 
 @app.delete("/session/{session_id}")
 def reset_session(session_id: str):
-    session.pop(session_id, None)
+    delete_history(session_id)
     return {"message": f"Session {session_id} đã được reset."}
 
 
@@ -85,15 +90,12 @@ def reset_session(session_id: str):
 @app.post("/chat", response_model=ChatResponse)
 
 def chat_endpoint(req: ChatRequest):
-
-    if req.session_id not in session:
-        session[req.session_id] = []
-
-    user_history = session[req.session_id]
-    user_history.append({"role": "user", "content" : req.message})
+    save_message(req.session_id, "user", req.message)  # Save user message to the database
+    # Lấy lịch sử chat từ cơ sở dữ liệu
+    user_history = get_history(req.session_id)
 
     bot_reply, model_used = get_ai_reply(user_history)
-    user_history.append({"role": "model", "content" : bot_reply})
+    save_message(req.session_id, "model", bot_reply)  # Save AI reply to the database
     return ChatResponse(session_id=req.session_id, reply=bot_reply, model_used=model_used)
 
  
