@@ -95,3 +95,9 @@ if prompt := st.chat_input("Hỏi tôi bất cứ điều gì..."):
                     st.error(f"Error: Mã {response.status_code}")
             except requests.exceptions.RequestException as e:
                 st.error(f"Không thể kết nối tới backend: {e}")
+
+
+
+
+### uvicorn week01.main:app --reload
+### streamlit run week01/app.py

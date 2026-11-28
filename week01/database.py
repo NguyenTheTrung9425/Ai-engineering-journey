@@ -18,11 +18,16 @@ def save_message(session_id: str, role: str, content: str):
                      (session_id, role, content))
         conn.commit()
 
-def get_history(session_id: str) -> list[dict]:
+def get_history(session_id: str, limit: int = 20) -> list[dict]:
     with sqlite3.connect(DB_NAME) as conn:
-        cursor = conn.execute('SELECT role, content FROM chat_history WHERE session_id = ? ORDER BY id ASC',
-                              (session_id,))
-        history = [{"role": row[0], "content": row[1]} for row in cursor.fetchall()]
+        cursor = conn.execute('SELECT role, content FROM chat_history WHERE session_id = ? ORDER BY id DESC LIMIT ?',
+                              (session_id, limit))
+        history = []
+        row = cursor.fetchall()
+        rows = row[::-1]
+
+        for h in rows:
+            history.append({"role": h[0], "content": h[1]})
 
     return history
 
@@ -36,7 +41,10 @@ if __name__ == "__main__":
     init_db()
     save_message("test_session", "user", "Hello, this is a test message.")
     save_message("test_session", "assistant", "Hello, this is a test reply.")
-    print("sau Khi luu", get_history("test_session"))
+    save_message("test_session", "user", "You can change the content of this message.")
+    save_message("test_session", "assistant", "Yes, I can help you with that. What would you like to change?")
+
+    print("sau Khi luu", get_history("test_session", 2))
     delete_history("test_session")
     print("sau Khi xoa", get_history("test_session"))
 
